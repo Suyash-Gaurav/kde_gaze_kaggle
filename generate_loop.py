@@ -14,6 +14,7 @@ import torch
 
 from compressors import BaseCompressor, FullCompressor, apply_keep_to_caches
 from metrics import plan_keep_rate
+from transformers.cache_utils import DynamicCache
 
 
 @dataclass
@@ -36,23 +37,21 @@ def _peak_gb() -> float:
     return torch.cuda.max_memory_allocated() / 1e9
 
 
+
 def _get_kv_lists(past):
     if past is None:
         raise RuntimeError("model returned no past_key_values")
-    if hasattr(past, "key_cache") and hasattr(past, "value_cache"):
-        return list(past.key_cache), list(past.value_cache), past
-    keys = [layer[0] for layer in past]
-    vals = [layer[1] for layer in past]
-    return keys, vals, None
+    if isinstance(past, tuple):
+        past = DynamicCache.from_legacy_cache(past)
+    return list(past.key_cache), list(past.value_cache), past
+
 
 
 def _set_kv_lists(past, keys, vals):
-    if hasattr(past, "key_cache"):
-        past.key_cache = keys
-        past.value_cache = vals
-        return past
-    return tuple((k, v) for k, v in zip(keys, vals))
-
+    # `past` is always a DynamicCache after _get_kv_lists, so mutate in place.
+    past.key_cache = keys
+    past.value_cache = vals
+    return past
 
 def prompt_for(question: str) -> str:
     return (
