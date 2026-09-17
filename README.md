@@ -1,6 +1,6 @@
 # KDE-gaze KV probe (Kaggle T4)
 
-Research-grade rewrite of the virtual-token draft. Compressors **index-select
+Compressors **index-select
 real K/V**. Attention stays stock SDPA. `model.generate` is not used.
 
 ## Pass A (first Kaggle session)

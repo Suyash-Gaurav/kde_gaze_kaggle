@@ -1,0 +1,24 @@
+{
+  "preset": "quick",
+  "models": [
+    "bert-base-uncased",
+    "roberta-base"
+  ],
+  "tasks": [
+    "sst2",
+    "rte"
+  ],
+  "methods": [
+    "head_only",
+    "last2",
+    "full_ft"
+  ],
+  "lr": 2e-05,
+  "batch_size": 16,
+  "seed": 42,
+  "epochs": {
+    "sst2": 3,
+    "rte": 8
+  },
+  "sst2_cap": 8000
+}
